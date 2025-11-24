@@ -16,10 +16,10 @@ print("="*70)
 # ZAPYTANIE 1: Pomiary dla konkretnej stacji
 # ============================================================================
 
-print("\n1️⃣ - POMIARY DLA KONKRETNEJ STACJI")
+print("\n - POMIARY DLA KONKRETNEJ STACJI")
 print("-"*70)
 
-#station_id = "USW00094728"
+#station_id = "USW00094728" #inna stacja
 station_id = "USC00519281"
 result = conn.execute(
     f"SELECT * FROM measurements WHERE station = '{station_id}' LIMIT 5"
@@ -35,18 +35,18 @@ for i, row in enumerate(result, 1):
 # ZAPYTANIE 2: Informacje o konkretnej stacji
 # ============================================================================
 
-print("\n2️⃣ - INFORMACJE O KONKRETNEJ STACJI")
+print("\n - INFORMACJE O KONKRETNEJ STACJI")
 print("-"*70)
 
-#station_id = "USW00094728"
+#station_id = "USW00094728" #inna stacja do sprawdzenia jak sie zmienia wynik i zachowuje kod jeśli w tym miejscu podamy stację
 result = conn.execute(
     f"SELECT * FROM stations WHERE station = '{station_id}'"
 ).fetchone()
 
 if result:
     print(f"\nStacja: {station_id}")
-    print(f"Nazwa: {result[4]}")
-    print(f"Kraj: {result[5]}")
+    print(f"Nazwa: {result[4]}") # indeksy kolumn zaczynają się od 0 :) !! Pamięcaj o tym
+    print(f"Kraj: {result[5]}") 
     print(f"Stan: {result[6]}")
     print(f"Szerokość geograficzna: {result[1]}")
     print(f"Długość geograficzna: {result[2]}")
@@ -58,7 +58,7 @@ else:
 # ZAPYTANIE 3: Stacje z konkretnego kraju
 # ============================================================================
 
-print("\n3️⃣ - WSZYSTKIE STACJE Z USA")
+print("\n - WSZYSTKIE STACJE Z USA")
 print("-"*70)
 
 result = conn.execute(
@@ -70,14 +70,50 @@ print(f"Liczba stacji: {len(result)}\n")
 for name, state in result:
     print(f"Stacja: {name} ({state})")
 
+# ===========================================================================
+# ZAPYTANIE 4a: Liczba stacji spoza USA
+# ============================================================================
+print("\n - LICZBA STACJI SPOZA USA")
+print("-"*70)
+count = conn.execute(
+    "SELECT COUNT(*) FROM stations WHERE country != 'US'"
+).fetchone()[0]
+
+print(f"Razem stacji spoza USA: {count}")
+
+#==========================================================================
+# ZAPYTANIE 4b: Stacje uszeregowane według położenia najwyżej do najniżej
+#==========================================================================
+print("\n - STACJE USZEREGOWANE WEDŁUG WYSOKOŚCI")
+print("-"*70)
+
+#PIerwotne zapytanie powodowało błędne sortowanie alfanumeryczne -
+#result = conn.execute(
+#    "SELECT name, country, elevation FROM stations ORDER BY elevation DESC"
+#).fetchall()
+
+#Kolumna elevation jest w bazie zapisana jako tekst
+#ORDER BY domyślnie sortuje alfanumerycznie w takim wypadku
+#CAST na typ liczbowy rozwiązuje problem
+
+# Poprawione zapytanie, aby porównać wartości liczbowe jako REAL, 
+# Tutaj CAST(elevation AS REAL) wymusza sortowanie według wartości liczbowej wysokości.
+
+result = conn.execute(
+    "SELECT name, country, elevation FROM stations ORDER BY CAST(elevation AS REAL) DESC"
+).fetchall()
+
+for name, country, elevation in result:
+    print(f"Kraj: {country}, Stacja: {name}, Wysokość: {elevation}m")
+
 # ============================================================================
 # ZAPYTANIE 4: Pomiary z konkretnego dnia
 # ============================================================================
 
-print("\n4️⃣ - WSZYSTKIE POMIARY Z KONKRETNEGO DNIA")
+print("\n - WSZYSTKIE POMIARY Z KONKRETNEGO DNIA")
 print("-"*70)
 
-date = "2020-01-01"
+date = "2011-01-13"
 result = conn.execute(
     f"SELECT station, date, precip, tobs FROM measurements WHERE date = '{date}' LIMIT 5"
 ).fetchall()
@@ -92,7 +128,7 @@ for station, date, precip, tobs in result:
 # ZAPYTANIE 5: WHERE z operatorem >
 # ============================================================================
 
-print("\n5️⃣ - POMIARY Z OPADAMI WIĘKSZYMI NIŻ 5MM")
+print("\n - POMIARY Z OPADAMI WIĘKSZYMI NIŻ 5MM")
 print("-"*70)
 
 result = conn.execute(

@@ -14,12 +14,13 @@ print("="*70)
 print("\n1. WYBIERZ WSZYSTKIE KOLUMNY Z TABELI STATIONS (LIMIT 5)")
 print("-"*70)
 
-result = conn.execute("SELECT * FROM stations LIMIT 5").fetchall()
+result = conn.execute("SELECT * FROM stations LIMIT 5").fetchall() # Pobranie wszystkich kolumn z tabeli stations z limitem 5
 
-print(f"Liczba wyników: {len(result)}\n")
+print(f"Liczba wyników: {len(result)}\n") # Wyświetlenie liczby wyników
 
-for i, row in enumerate(result, 1):
-    print(f"Wiersz {i}: {row}")
+# Wyświetlenie wyników 
+for i, row in enumerate(result, 1): # Numerowanie od 1
+    print(f"Wiersz {i}: {row}") # Wyświetlenie każdego wiersza wyników
 
 # ============================================================================
 # ZAPYTANIE 2: SELECT * FROM measurements LIMIT 5
@@ -39,12 +40,12 @@ for i, row in enumerate(result, 1):
 # ZAPYTANIE 3: SELECT z określonymi kolumnami
 # ============================================================================
 
-print("\n3️. WYBIERZ TYLKO NAZWY i KRAJE STACJI")
+print("\n3️. WYBIERZ TYLKO KRAJE i NAZWY STACJI")
 print("-"*70)
 
-result = conn.execute("SELECT name, country FROM stations").fetchall()
+result = conn.execute("SELECT name, country FROM stations").fetchall() # Pobranie nazw i krajów ze stacji
 
-print(f"Liczba wyników: {len(result)}\n")
+print(f"Liczba wyników: {len(result)}\n") # Wyświetlenie liczby wyników
 
 for name, country in result:
     print(f"Kraj {country}, Stacja: {name}")
@@ -56,7 +57,7 @@ for name, country in result:
 print("\n4. POLICZ ILE JEST STACJI")
 print("-"*70)
 
-count = conn.execute("SELECT COUNT(*) FROM stations").fetchone()[0]
+count = conn.execute("SELECT COUNT(*) FROM stations").fetchone()[0] # Pobranie liczby stacji z tabeli stations
 print(f"Razem stacji w bazie: {count}")
 
 # ============================================================================
@@ -78,7 +79,7 @@ print("-"*70)
 
 result = conn.execute("SELECT DISTINCT station FROM measurements").fetchall()
 
-print(f"Liczba unikalnych stacji z pomiarami: {len(result)}\n")
+print(f"Liczba/lista unikalnych stacji z pomiarami: {len(result)}\n")
 
 for (station,) in result:
     print(f"Stacja: {station}")
@@ -87,7 +88,7 @@ for (station,) in result:
 #ZAPYTANIE 7: WHERE - Filtrowanie wyników, ile pomiarów dla konkretnej stacji
 # ============================================================================
 print("\n7. Dla stacji  które mają pomiary wypisz jaka jest ich liczba\n" \
-"Podaj także sumę tych pomiarów dla sprawdzenia.")
+      "   (użycie SELECT DISTINCT oraz COUNT z WHERE)")
 print("-"*70)
 
 for (station,) in conn.execute("SELECT DISTINCT station FROM measurements").fetchall():
@@ -101,5 +102,5 @@ for (station,) in conn.execute("SELECT DISTINCT station FROM measurements").fetc
 conn.close()
 
 print("\n" + "="*70)
-print("Przykład 1 zakończony!")
+print("Przykład 1 - podstawowe zapytania SELECT zakończony!")
 print("="*70)
