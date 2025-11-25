@@ -19,7 +19,7 @@ print("="*70)
 print("\n - POMIARY DLA KONKRETNEJ STACJI")
 print("-"*70)
 
-#station_id = "USW00094728" #inna stacja
+#station_id = "USW00094728" #inna stacja dla testu
 station_id = "USC00519281"
 result = conn.execute(
     f"SELECT * FROM measurements WHERE station = '{station_id}' LIMIT 5"
@@ -87,7 +87,7 @@ print(f"Razem stacji spoza USA: {count}")
 print("\n - STACJE USZEREGOWANE WEDŁUG WYSOKOŚCI")
 print("-"*70)
 
-#PIerwotne zapytanie powodowało błędne sortowanie alfanumeryczne -
+#PIerwotne zapytanie - powodowało błędne sortowanie alfanumeryczne -
 #result = conn.execute(
 #    "SELECT name, country, elevation FROM stations ORDER BY elevation DESC"
 #).fetchall()

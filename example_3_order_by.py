@@ -16,11 +16,11 @@ print("="*70)
 # ZAPYTANIE 1: Sortowanie alfabetyczne stacji
 # ============================================================================
 
-print("\n1️⃣ STACJE POSORTOWANE ALFABETYCZNIE")
+print("\nSTACJE POSORTOWANE ALFABETYCZNIE")
 print("-"*70)
 
 result = conn.execute(
-    "SELECT name, state FROM stations ORDER BY name ASC"
+    "SELECT name, state FROM stations ORDER BY name ASC" #domyślnie rosnąco ASCending
 ).fetchall()
 
 print(f"Liczba stacji: {len(result)}\n")
@@ -32,11 +32,11 @@ for name, state in result:
 # ZAPYTANIE 2: Sortowanie odwrotne (Z na A)
 # ============================================================================
 
-print("\n2️⃣ STACJE W PORZĄDKU ODWROTNYM (Z-A)")
+print("\nSTACJE W PORZĄDKU ODWROTNYM (Z-A)")
 print("-"*70)
 
 result = conn.execute(
-    "SELECT name, state FROM stations ORDER BY name DESC"
+    "SELECT name, state FROM stations ORDER BY name DESC" #malejąco DESCending
 ).fetchall()
 
 print(f"Liczba stacji: {len(result)}\n")
@@ -48,7 +48,7 @@ for name, state in result:
 # ZAPYTANIE 3: Sortowanie według szerokości geograficznej
 # ============================================================================
 
-print("\n3️⃣ STACJE POSORTOWANE WEDŁUG SZEROKOŚCI GEOGRAFICZNEJ")
+print("\nSTACJE POSORTOWANE WEDŁUG SZEROKOŚCI GEOGRAFICZNEJ")
 print("-"*70)
 
 result = conn.execute(
@@ -64,10 +64,11 @@ for name, lat, lon in result:
 # ZAPYTANIE 4: Sortowanie pomiarów według daty
 # ============================================================================
 
-print("\n4️⃣ POMIARY DLA STACJI POSORTOWANE CHRONOLOGICZNIE")
+print("\nPOMIARY DLA STACJI POSORTOWANE CHRONOLOGICZNIE")
 print("-"*70)
 
-station_id = "USW00094728"
+station_id = "USC00519397"  # Przykładowa stacja
+#station_id = "USW00094728" # Nie ma takiej stacji w example_2_where_filter.py" 
 result = conn.execute(
     f"SELECT date, precip, tobs FROM measurements WHERE station = '{station_id}' ORDER BY date ASC LIMIT 10"
 ).fetchall()
@@ -76,12 +77,15 @@ print(f"Pomiary dla stacji {station_id} (10 najwcześniejszych):\n")
 
 for date, precip, tobs in result:
     print(f"Data: {date}, Opady: {precip}mm, Temperatura: {tobs}°C")
+if len(result) == 0:
+    print("Brak wyników dla podanej stacji.")
+        
 
 # ============================================================================
 # ZAPYTANIE 5: Sortowanie i liczenie
 # ============================================================================
 
-print("\n5️⃣ STACJE POSORTOWANE WEDŁUG WYSOKOŚCI (OD NAJWYŻSZEJ)")
+print("\nSTACJE POSORTOWANE WEDŁUG WYSOKOŚCI (OD NAJWYŻSZEJ)")
 print("-"*70)
 
 result = conn.execute(
@@ -97,5 +101,5 @@ for name, elevation in result:
 conn.close()
 
 print("\n" + "="*70)
-print("✓ Przykład 3 zakończony!")
+print("Przykład 3 zakończony!")
 print("="*70)

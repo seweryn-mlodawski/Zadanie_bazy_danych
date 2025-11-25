@@ -16,7 +16,7 @@ print("="*70)
 # ZAPYTANIE 1: COUNT - Liczenie wierszy
 # ============================================================================
 
-print("\n1️⃣ POLICZ WSZYSTKIE STACJE I POMIARY")
+print("\nPOLICZ WSZYSTKIE STACJE I POMIARY")
 print("-"*70)
 
 count_stations = conn.execute("SELECT COUNT(*) FROM stations").fetchone()[0]
@@ -29,24 +29,60 @@ print(f"Razem pomiarów w bazie: {count_measurements}")
 # ZAPYTANIE 2: AVG - Średnia wartość
 # ============================================================================
 
-print("\n2️⃣ ŚREDNIA TEMPERATURA Z WSZYSTKICH POMIARÓW")
+print("\nŚREDNIA TEMPERATURA ZE WSZYSTKICH POMIARÓW")
 print("-"*70)
 
-# Uwaga: dane są tekstowe, więc AVG może nie działać idealnie
-# Pokazuję koncepcję
-try:
-    result = conn.execute(
-        "SELECT COUNT(*) as liczba_pomiarow FROM measurements WHERE tobs != ''"
-    ).fetchone()
-    print(f"Liczba pomiarów z temperaturą: {result[0]}")
-except Exception as e:
-    print(f"Błąd: {e}")
+
+# Obliczanie średniej temperatury CAST na REAL dla poprawności obliczeń
+# != '' aby pominąć puste wartości
+
+result = conn.execute(
+    "SELECT AVG(CAST(tobs AS REAL)) FROM measurements WHERE tobs != ''"
+).fetchone()[0]
+
+print(f"Średnia temperatura: {result:.2f}K")
+
+
+
+# Pokaż tylko wyniki z pustymi pomiarami
+result_empty = conn.execute(
+    "SELECT COUNT(*) FROM measurements WHERE tobs = ''"
+).fetchone()[0]
+
+print(f"Ilość pomiarów bez temperatury: {result_empty}")
+print(f"Lista pomiarów bez temperatury (pierwsze 5):")
+
+result_empty_list = conn.execute(
+    "SELECT * FROM measurements WHERE tobs = '' LIMIT 5"
+).fetchall()
+
+if len(result_empty_list) == 0:
+    print(">>Brak wyników z pustymi pomiarami<<")
+else:
+    for row in result_empty_list:
+        print(row)
+
+result = conn.execute("""
+    SELECT 
+        COUNT(*) as pomiary,
+        AVG(CAST(tobs AS REAL)) as srednia,
+        MIN(CAST(tobs AS REAL)) as minimum,
+        MAX(CAST(tobs AS REAL)) as maksimum
+    FROM measurements
+    WHERE tobs != ''
+""").fetchone()
+
+count, avg, min_val, max_val = result
+print(f"Minimum: {min_val}K")
+print(f"Maksimum: {max_val}K")
+print(f"Średnia: {avg:.2f}K")
+
 
 # ============================================================================
 # ZAPYTANIE 3: MAX i MIN - Maksimum i minimum
 # ============================================================================
 
-print("\n3️⃣ NAJWYŻSZA I NAJNIŻSZA STACJA")
+print("\nNAJWYŻSZA I NAJNIŻSZA STACJA")
 print("-"*70)
 
 # Znajdujemy ID stacji z najwyższą wysokością
@@ -68,7 +104,7 @@ if result_min:
 # ZAPYTANIE 4: Pomiary na stację - ile pomiarów dla każdej stacji
 # ============================================================================
 
-print("\n4️⃣ ILE POMIARÓW DLA KAŻDEJ STACJI")
+print("\nILE POMIARÓW DLA KAŻDEJ STACJI")
 print("-"*70)
 
 result = conn.execute(
@@ -84,7 +120,7 @@ for station, count in result:
 # ZAPYTANIE 5: Pomiary z opadami - ile pomiarów ma opady > 0
 # ============================================================================
 
-print("\n5️⃣ POMIARY Z OPADAMI (PRECIP > 0)")
+print("\nPOMIARY Z OPADAMI (PRECIP > 0)")
 print("-"*70)
 
 result = conn.execute(
@@ -104,7 +140,7 @@ print(f"Procent pomiarów z opadami: {percentage:.2f}%")
 # ZAPYTANIE 6: Statystyka dla konkretnej stacji
 # ============================================================================
 
-print("\n6️⃣ STATYSTYKA DLA KONKRETNEJ STACJI")
+print("\nSTATYSTYKA DLA KONKRETNEJ STACJI")
 print("-"*70)
 
 station_id = "USW00094728"
@@ -128,5 +164,5 @@ print(f"Pomiarów bez opadów: {count - precip_count}")
 conn.close()
 
 print("\n" + "="*70)
-print("✓ Przykład 4 zakończony!")
+print("Przykład 4 zakończony!")
 print("="*70)
