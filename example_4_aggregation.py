@@ -62,6 +62,8 @@ else:
     for row in result_empty_list:
         print(row)
 
+# ============================================================================
+
 result = conn.execute("""
     SELECT 
         COUNT(*) as pomiary,
@@ -72,7 +74,7 @@ result = conn.execute("""
     WHERE tobs != ''
 """).fetchone()
 
-count, avg, min_val, max_val = result
+count, avg, min_val, max_val = result # wyniki zapytania
 print(f"Minimum: {min_val}K")
 print(f"Maksimum: {max_val}K")
 print(f"Średnia: {avg:.2f}K")
@@ -116,6 +118,18 @@ print(f"Liczba stacji z pomiarami: {len(result)}\n")
 for station, count in result:
     print(f"Stacja: {station}, Pomiary: {count}")
 
+#============================================================================
+#Zapytanie 4a: Pomiary na stację - ile pomiarów dla każdej stacji z sortowaniem
+#============================================================================
+print("\nILE POMIARÓW DLA KAŻDEJ STACJI (POSORTOWANE MALEJĄCO)")
+print("-"*70)
+result = conn.execute(
+    "SELECT station, COUNT(*) as liczba_pomiarow FROM measurements GROUP BY station ORDER BY liczba_pomiarow DESC"
+).fetchall() 
+print(f"Liczba stacji z pomiarami: {len(result)}\n")
+for station, count in result:
+    print(f"Stacja: {station}, Pomiary: {count}")
+
 # ============================================================================
 # ZAPYTANIE 5: Pomiary z opadami - ile pomiarów ma opady > 0
 # ============================================================================
@@ -143,7 +157,8 @@ print(f"Procent pomiarów z opadami: {percentage:.2f}%")
 print("\nSTATYSTYKA DLA KONKRETNEJ STACJI")
 print("-"*70)
 
-station_id = "USW00094728"
+#station_id = "USW00094728" #  nie istnieje w bazie
+station_id = "USC00511918"  # Przykładowa stacja
 
 # Liczba pomiarów
 count = conn.execute(

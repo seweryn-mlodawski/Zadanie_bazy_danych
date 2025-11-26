@@ -16,9 +16,12 @@ print("="*70)
 # ZAPYTANIE 1: JOIN - Łączenie stacji z pomiarami
 # ============================================================================
 
-print("\n1️⃣ POŁĄCZ DANE STACJI Z POMIARAMI")
+print("\nPOŁĄCZ DANE STACJI Z POMIARAMI")
 print("-"*70)
 
+# s - alias dla tabeli stations
+# m - alias dla tabeli measurements
+# JOIN złącz measurements nazwij ją m, 
 result = conn.execute("""
     SELECT 
         s.name,
@@ -39,7 +42,7 @@ for name, date, precip, tobs in result:
 # ZAPYTANIE 2: GROUP BY - Liczba pomiarów na stację
 # ============================================================================
 
-print("\n2️⃣ LICZBA POMIARÓW NA KAŻDĄ STACJĘ (GROUP BY)")
+print("\nLICZBA POMIARÓW NA KAŻDĄ STACJĘ (GROUP BY)")
 print("-"*70)
 
 result = conn.execute("""
@@ -61,7 +64,7 @@ for name, count in result:
 # ZAPYTANIE 3: WHERE + JOIN
 # ============================================================================
 
-print("\n3️⃣ POMIARY TYLKO Z OPADAMI DLA KAŻDEJ STACJI")
+print("\nPOMIARY TYLKO Z OPADAMI DLA KAŻDEJ STACJI")
 print("-"*70)
 
 result = conn.execute("""
@@ -84,7 +87,7 @@ for name, count in result:
 # ZAPYTANIE 4: Statystyka pomiarów dla każdej stacji
 # ============================================================================
 
-print("\n4️⃣ STATYSTYKA POMIARÓW NA STACJĘ")
+print("\nSTATYSTYKA POMIARÓW NA STACJĘ")
 print("-"*70)
 
 result = conn.execute("""
@@ -113,7 +116,7 @@ for station_id, name, total, with_precip, without_precip in result:
 # ZAPYTANIE 5: Pomiary z datą zamiast surowych danych
 # ============================================================================
 
-print("\n5️⃣ POMIARY DLA KONKRETNEJ STACJI - SFORMATOWANE")
+print("\nPOMIARY DLA KONKRETNEJ STACJI - SFORMATOWANE")
 print("-"*70)
 
 station_id = "USW00094728"
@@ -147,7 +150,7 @@ else:
 # ZAPYTANIE 6: HAVING - filtrowanie wyników GROUP BY
 # ============================================================================
 
-print("\n6️⃣ STACJE Z WIĘCEJ NIŻ 100 POMIARÓW")
+print("\nSTACJE Z WIĘCEJ NIŻ 1000 POMIARÓW")
 print("-"*70)
 
 result = conn.execute("""
@@ -157,7 +160,7 @@ result = conn.execute("""
     FROM stations s
     JOIN measurements m ON s.station = m.station
     GROUP BY s.station
-    HAVING COUNT(m.station) > 100
+    HAVING COUNT(m.station) > 1000
     ORDER BY liczba_pomiarow DESC
 """).fetchall()
 
@@ -170,5 +173,76 @@ for name, count in result:
 conn.close()
 
 print("\n" + "="*70)
-print("✓ Przykład 5 zakończony!")
+print("Przykład 5 zakończony!")
+print("="*70)
+
+# ============================================================================
+# Zapytanie 6a - Podzapytania w SELECT
+# ============================================================================
+print("\nPODZAPYTANIA W SELECT")
+print("-"*70)
+conn = sqlite3.connect('air_quality.db')
+result = conn.execute("""
+    SELECT 
+        s.station,
+        s.name,
+        (SELECT COUNT(*) FROM measurements m WHERE m.station = s.station) as total_measurements,
+        (SELECT AVG(tobs) FROM measurements m2 WHERE m2.station = s.station AND m2.tobs != '') as avg_temp
+    FROM stations s
+    LIMIT 10
+""").fetchall()
+for station_id, name, total_measurements, avg_temp in result:
+    print(f"Stacja: {name} ({station_id})")
+    print(f"  Razem pomiarów: {total_measurements}")
+    print(f"  Średnia temperatura: {avg_temp:.2f}°C" if avg_temp is not None else "  Brak danych o temperaturze")
+# Zamknięcie połączenia
+conn.close()
+print("\n" + "="*70)
+print("Przykład 5a zakończony!")
+print("="*70)
+# ============================================================================
+# Zapytanie 6b - Zapytnie z przedziałem 
+# ============================================================================
+print("\nPOMIARY W PRZEDZIALE 1000-2000 MM OPADÓW")
+print("-"*70)
+conn = sqlite3.connect('air_quality.db')
+result = conn.execute("""
+    SELECT 
+        s.name,
+        COUNT(m.station) as liczba_pomiarow
+    FROM stations s
+    JOIN measurements m ON s.station = m.station
+    GROUP BY s.station
+    HAVING SUM(m.precip) BETWEEN 1000 AND 2000
+    ORDER BY liczba_pomiarow ASC
+    """).fetchall()
+print(f"Liczba stacji: {len(result)}\n")
+for name, count in result:
+    print(f"Stacja: {name}, Pomiarów: {count}")
+    for measurement in conn.execute("""
+        SELECT 
+            m.date,
+            m.precip,
+            s.name
+        FROM stations s
+        JOIN measurements m ON s.station = m.station
+        WHERE s.name = ?
+        ORDER BY m.precip ASC
+        limit 20
+        """, (name,)).fetchall():
+        date, precip, station_name = measurement
+        print(f"    Stacja: {station_name} Data: {date}, Opady: {precip}mm")
+        
+        # do poprawki
+
+
+# wyświetlenie pomiarów w przedziale 1000-2000 mm opadów
+
+    
+
+
+# Zamknięcie połączenia
+conn.close()
+print("\n" + "="*70)
+print("Przykład zakończony!")
 print("="*70)
