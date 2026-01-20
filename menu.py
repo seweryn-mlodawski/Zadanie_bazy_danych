@@ -175,25 +175,25 @@ def check_prerequisites():
         print("="*70)
         print("Baza danych 'air_quality.db' nie istnieje!")
         print("\nMusisz najpierw uruchomić:")
-        print("  python solution_proper_fixed_v2.py")
+        print("  python create_database.py")
         print("\nAby utworzyć bazę danych.\n")
         print("="*70 + "\n")
         
         response = input("Czy chcesz to zrobić teraz? (t/n): ").strip().lower()
         
         if response == 't':
-            print("\nUruchamianie solution_proper_fixed_v2.py...\n")
+            print("\nUruchamianie create_database.pyper_fixed_v2.py...\n")
             try:
-                subprocess.run([sys.executable, "solution_proper_fixed_v2.py"], check=True)
+                subprocess.run([sys.executable, "create_database.py"], check=True)
                 print("\n✅ Baza danych została utworzona!")
                 input("\nNaciśnij ENTER aby kontynuować...")
                 clear_screen()
             except subprocess.CalledProcessError:
                 print("\n❌ Błąd podczas tworzenia bazy danych!")
-                print("Spróbuj uruchomić ręcznie: python solution_proper_fixed_v2.py")
+                print("Spróbuj uruchomić ręcznie: python create_database.py")
                 sys.exit(1)
             except FileNotFoundError:
-                print("\n❌ Nie znaleziono pliku 'solution_proper_fixed_v2.py'")
+                print("\n❌ Nie znaleziono pliku 'create_database.py'")
                 sys.exit(1)
         else:
             print("\nUpewnij się że baza istnieje przed uruchomieniem przykładów!")
